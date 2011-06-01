@@ -1,0 +1,52 @@
+----------------------------------------------------------------------
+		   Simple hector / cassandra tests
+----------------------------------------------------------------------
+
+
+Using Hector version: 0.7.0-24
+
+
+These projects are basicly "private" testing projects so that I can have reminders 
+how to implement stuff when I need them. 
+
+These projects are not meant to be "brilliant" - they work for me as reminders.
+Hopefully someone may also find them useful.
+
+
+======================================================================
+			 USE AT YOUR OWN RISK
+======================================================================
+
+
+1) Download cassandra (check the actual latest version)
+
+curl -o cassandra.tar.gz http://mirror.eunet.fi/apache//cassandra/0.7.6/apache-cassandra-0.7.6-2-bin.tar.gz
+
+
+2) Extract and configure 
+
+tar zxvf cassandra.tar.gz 
+
+cd apache-cassandra-0.7.6-2/conf
+
+# Change /var to /tmp in configs so that cassandra can be run with basic user rights, not root
+
+sed -i.backup 's/\/var/\/tmp/g' *
+cd ..
+
+
+3) Start cassandra
+
+./bin/cassandra -f
+
+
+4) Create default keyspaces for testing
+
+./bin/cassandra-cli -h localhost -f  conf/schema-sample.txt
+
+
+5) Build and run the test code (in another terminal)
+
+mvn clean install
+
+mvn exec:java -Dexec.mainClass="fi.mlyly.testing.App"
