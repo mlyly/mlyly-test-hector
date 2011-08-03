@@ -1,5 +1,6 @@
 package fi.mlyly.testing;
 
+import me.prettyprint.cassandra.serializers.StringSerializer;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
 import me.prettyprint.hector.api.factory.HFactory;
@@ -16,6 +17,7 @@ public abstract class AbstractBaseTest {
     
     private static final Logger log = LoggerFactory.getLogger(AbstractBaseTest.class);
     
+    protected static StringSerializer _ss = StringSerializer.get();
     protected static Cluster _cluster;
     protected static Keyspace _keyspace;
     
