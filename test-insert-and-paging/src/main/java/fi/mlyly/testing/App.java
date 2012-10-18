@@ -1,6 +1,7 @@
 package fi.mlyly.testing;
 
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.prettyprint.cassandra.serializers.LongSerializer;
 import me.prettyprint.cassandra.serializers.StringSerializer;
@@ -15,49 +16,49 @@ import me.prettyprint.hector.api.query.RangeSlicesQuery;
 
 /**
  * Simple testing for Hector & Cassandra.
- * 
+ *
  * How to inserts and select all / paging.
  */
 public class App {
-    
+
     private static final Logger log = Logger.getAnonymousLogger();
-    
+
     private static StringSerializer _ss = StringSerializer.get();
     private static LongSerializer _ls = LongSerializer.get();
 
     public static void main(String[] args) {
         log.info("main()...");
-        
+
         log.info("  Create cluster...");
         Cluster cluster = HFactory.getOrCreateCluster("TestCluster", "localhost:9160");
-        
+
         log.info("  Create Keyspace...");
         Keyspace keyspaceOperator = HFactory.createKeyspace("Keyspace1", cluster);
-        
+
         log.info("  Create Mutator...");
         Mutator<String> mutator = HFactory.createMutator(keyspaceOperator, _ss);
-        
+
         for (int i = 0; i < 10001; i++) {
             String key = UUID.randomUUID().toString() + "_" + i;
-            
+
             mutator.addInsertion(key, "Standard1", HFactory.createStringColumn("column_name_1", "column_1_value_" + i));
             mutator.addInsertion(key, "Standard1", HFactory.createStringColumn("column_name_2", "column_2_value_" + i));
 
             if (i % 1000 == 0) {
-                log.info("  Execute mutator... i = " + i);
+                log.log(Level.INFO, "  Execute mutator... i = {0}", i);
                 mutator.execute();
             }
         }
 
         log.info("  Execute mutator...");
         mutator.execute();
-        
+
         log.info("  Do the Query...");
-        
+
         int totalCount = 0;
         int pageSize = 2345;
         String keyStart = "";
-        
+
         RangeSlicesQuery<String, String, String> rangeSlicesQuery = HFactory.createRangeSlicesQuery(keyspaceOperator, _ss, _ss, _ss);
         rangeSlicesQuery.setColumnFamily("Standard1");
         rangeSlicesQuery.setRange("", "", false, 3);
@@ -88,9 +89,9 @@ public class App {
                 totalCount += orderedRows.getCount();
             }
         }
-        
+
         log.info("TOTAL 'rows' = " + totalCount);
-        
+
         log.info("  shutdown...");
         cluster.getConnectionManager().shutdown();
 
