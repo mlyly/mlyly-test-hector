@@ -18,6 +18,7 @@ import me.prettyprint.hector.api.query.RangeSlicesQuery;
  * Simple testing for Hector & Cassandra.
  *
  * How to inserts and select all / paging.
+ *
  */
 public class App {
 
